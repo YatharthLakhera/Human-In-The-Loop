@@ -66,3 +66,9 @@ CLI Arguments -> `--spring.profiles.active=local`
 
 Access the Swagger UI at:  
 `http://localhost:8080/swagger-ui.html`
+
+Basic UI For Workflow templates configurations - `http://localhost:8080`
+
+<img width="1432" height="699" alt="Screenshot 2025-10-16 at 2 16 52 PM" src="https://github.com/user-attachments/assets/b55c70a2-f493-4b7e-87b2-e63fc37faa35" />
+<img width="1414" height="466" alt="Screenshot 2025-10-16 at 3 12 12 PM" src="https://github.com/user-attachments/assets/cb9d7bc8-ba14-45c0-9f24-4aeedfac968a" />
+<img width="1423" height="526" alt="Screenshot 2025-10-16 at 3 12 30 PM" src="https://github.com/user-attachments/assets/7dc6902f-5cab-405a-9bcd-df9a512b188c" />
