@@ -1,0 +1,284 @@
+        :root {
+            --primary-bg: #0d1117;
+            --card-bg: #161b22;
+            --text-primary: #e6edf3;
+            --text-secondary: #7d8590;
+            --accent: #1f6feb;
+            --accent-hover: #2c7ef0;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border: 1px solid #30363d;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            background: linear-gradient(90deg, #58a6ff, #1f6feb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-floating > label {
+            color: var(--text-secondary);
+        }
+
+        .form-control, .form-control:focus {
+            background-color: #0d1117;
+            border-color: #30363d;
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(31, 111, 235, 0.25);
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background-color: #1f6feb80;
+            cursor: not-allowed;
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .workflow-card {
+            background: var(--card-bg);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .workflow-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .workflow-card h3 {
+            color: var(--accent);
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .workflow-card p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--accent);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+
+        #createFirstTemplateBtn .bi-plus-circle {
+            font-size: 1rem;
+            color: white;
+        }
+
+        .d-flex.justify-content-between > h2:only-child {
+            width: 100%;
+            text-align: center;
+        }
+
+        .d-flex.justify-content-between:has(button[style*="display: none"]) {
+            display: none !important;
+        }
+
+        .spinner-border {
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        /* Add these styles to your style.css */
+        .workflow-grid {
+            margin-top: 1.5rem;
+        }
+
+        .table {
+            --bs-table-bg: transparent;
+            --bs-table-striped-bg: rgba(0, 0, 0, 0.03);
+            --bs-table-hover-bg: rgba(0, 0, 0, 0.05);
+        }
+
+        .table th {
+            border-top: none;
+            border-bottom: 1px solid var(--bs-border-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 1rem 0.5rem;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+
+        .table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        /* In your style.css file */
+        #mainContent {
+            max-width: 180%;
+            margin: 0 auto; /* This centers the container */
+            padding: 0 15px; /* Add some horizontal padding */
+        }
+
+        /* For better mobile responsiveness */
+        @media (max-width: 992px) {
+            #mainContent {
+                max-width: 95%;
+            }
+        }
+        /* Add this to your style.css file */
+        #createFirstTemplateBtn,
+        #createFirstTemplateBtn2 {
+            min-width: 300px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        /* For the button in the empty state */
+        #emptyState .btn {
+            min-width: 300px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
