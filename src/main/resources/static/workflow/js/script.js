@@ -7,27 +7,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const authModal = document.getElementById('authModal');
     const mainContent = document.getElementById('mainContent');
     const workflowList = document.getElementById('workflowList');
+    const workflowTableCard = document.getElementById('workflowTableCard');
     const emptyState = document.getElementById('emptyState');
-    const newTemplateBtn = document.getElementById('newTemplateBtn');
-    // Replace any existing event listener for createFirstTemplateBtn
-    document.getElementById('createFirstTemplateBtn').addEventListener('click', createWorkflowTemplate);
+    const createTemplateBtn = document.getElementById('createTemplateBtn');
+    const createFirstTemplateBtn = document.getElementById('createFirstTemplateBtn');
     const newTemplateModal = document.getElementById('newTemplateModal');
     const templateForm = document.getElementById('templateForm');
-    if (templateForm) {
-        templateForm.addEventListener('submit', handleTemplateSubmit);
-    }
     const submitBtn = document.getElementById('submitTemplate');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const form = document.getElementById('templateForm');
-            if (form) {
-                form.dispatchEvent(new Event('submit'));
-            }
-        });
-    }
-
-    const submitSpinner = document.getElementById('submitSpinner');
 
     // Global variables
     let editor = null;
@@ -51,35 +37,47 @@ document.addEventListener('DOMContentLoaded', function () {
     tenantForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const inputTenantId = tenantIdInput.value.trim();
+
         if (inputTenantId) {
-            localStorage.setItem('tenantId', inputTenantId);
-            tenantId = inputTenantId;
-            showMainContent();
-            loadWorkflowTemplates();
+            showLoading(true);
+            // Simulate API call delay
+            setTimeout(() => {
+                localStorage.setItem('tenantId', inputTenantId);
+                tenantId = inputTenantId;
+                showMainContent();
+                loadWorkflowTemplates();
+            }, 500);
         }
     });
 
-    // Handle create first template button
-    if (createFirstTemplateBtn) {
-        createFirstTemplateBtn.addEventListener('click', function (e) {
+    // Handle template form submission
+    if (templateForm) {
+        templateForm.addEventListener('submit', handleTemplateSubmit);
+    }
+
+    // Handle submit button click
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function (e) {
             e.preventDefault();
-            const modal = new bootstrap.Modal(newTemplateModal);
-            modal.show();
+            if (templateForm) {
+                templateForm.dispatchEvent(new Event('submit'));
+            }
         });
     }
 
-    // Handle new template button (in header)
-    if (newTemplateBtn) {
-        newTemplateBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const modal = new bootstrap.Modal(newTemplateModal);
-            modal.show();
-        });
+    // Handle create template buttons
+    if (createTemplateBtn) {
+        createTemplateBtn.addEventListener('click', openTemplateModal);
+    }
+
+    if (createFirstTemplateBtn) {
+        createFirstTemplateBtn.addEventListener('click', openTemplateModal);
     }
 
     // Initialize CodeMirror when modal is shown
     newTemplateModal.addEventListener('shown.bs.modal', function () {
         const editorElement = document.getElementById('editor');
+
         if (editorElement && !editor) {
             // Clear any existing content
             editorElement.innerHTML = '';
@@ -96,12 +94,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 lineNumbers: true,
                 lineWrapping: true,
                 autoCloseTags: true,
-                matchTags: {
-                    bothTags: true
-                },
-                extraKeys: {
-                    "Ctrl-Space": "autocomplete"
-                },
+                matchTags: { bothTags: true },
+                extraKeys: { "Ctrl-Space": "autocomplete" },
                 viewportMargin: Infinity,
                 autoRefresh: true
             });
@@ -114,21 +108,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('templateContent').value = cm.getValue();
             });
 
-            // Force refresh the editor to ensure it's properly sized
+            // Force refresh the editor
             setTimeout(() => editor.refresh(), 0);
         } else if (editor) {
             editor.refresh();
         }
     });
-    // Make sure both create buttons open the modal
-    document.querySelectorAll('[id^="createFirstTemplateBtn"]').forEach(btn => {
-        btn.addEventListener('click', createWorkflowTemplate);
+
+    // Reset form when modal is hidden
+    newTemplateModal.addEventListener('hidden.bs.modal', function () {
+        if (templateForm) {
+            templateForm.reset();
+        }
+        if (editor) {
+            editor.setValue('<!-- Your HTML template here -->\n<!-- Use placeholders like {{workflowId}}, {{workflowName}}, {{workflowDescription}}, {{requesterServiceName}}, {{approveLink}}, {{rejectLink}} -->\n');
+        }
     });
 
-    // Load templates when page loads
-    loadWorkflowTemplates();
     // Helper Functions
-
     function showLoading(isLoading) {
         if (isLoading) {
             proceedBtn.style.display = 'none';
@@ -148,95 +145,110 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 300);
     }
 
-    function loadWorkflowTemplates() {
-        showLoading(true);
+    function openTemplateModal(e) {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(newTemplateModal);
+        modal.show();
+    }
 
+    function loadWorkflowTemplates() {
         fetch('/v1/workflow/templates', {
             headers: {
                 'Content-Type': 'application/json',
                 'tenant-id': tenantId
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to load templates');
-            }
-            return response.json();
-        })
-        .then(templates => {
-            displayTemplates(templates);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to load templates. Please try again.');
-        })
-        .finally(() => {
-            showLoading(false);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load templates');
+                }
+                return response.json();
+            })
+            .then(templates => {
+                displayTemplates(templates);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Show empty state on error
+                displayTemplates([]);
+            });
     }
 
     function displayTemplates(templates) {
-        const workflowList = document.getElementById('workflowList');
-        const emptyState = document.getElementById('emptyState');
-
         if (!templates || templates.length === 0) {
-            workflowList.innerHTML = '';
+            // Show empty state
+            workflowTableCard.style.display = 'none';
             emptyState.classList.remove('d-none');
+            // Hide header create button when empty
+            if (createTemplateBtn) {
+                createTemplateBtn.style.display = 'none';
+            }
             return;
         }
 
+        // Show table
+        workflowTableCard.style.display = 'block';
         emptyState.classList.add('d-none');
+        // Show header create button when templates exist
+        if (createTemplateBtn) {
+            createTemplateBtn.style.display = 'inline-flex';
+        }
 
-        workflowList.innerHTML = templates.map(template => `
-            <tr>
-                <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                        <div class="ms-3">
-                            <h6 class="mb-0">${template.name || 'Untitled Template'}</h6>
-                            <small class="text-muted">${template.description || 'No description'}</small>
+        // Populate table
+        workflowList.innerHTML = templates.map(template => {
+            const createdDate = template.createdAt
+                ? new Date(template.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                })
+                : 'N/A';
+
+            return `
+                <tr>
+                    <td class="ps-4">
+                        <div>
+                            <h6 class="mb-1">${escapeHtml(template.name || 'Untitled Template')}</h6>
+                            <small class="text-muted">${escapeHtml(template.description || 'No description provided')}</small>
                         </div>
-                    </div>
-                </td>
-                <td><code>${template.workflowId}</code></td>
-                <td>
-                    <span class="badge bg-primary">${template.channel || 'N/A'}</span>
-                </td>
-            </tr>
-        `).join('');
+                    </td>
+                    <td>
+                        <code>${escapeHtml(template.workflowId)}</code>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary">${escapeHtml(template.channel || 'EMAIL')}</span>
+                    </td>
+                    <td>
+                        <small class="text-muted">${createdDate}</small>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
-    function createWorkflowTemplate(e) {
-        e.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById('newTemplateModal'));
-        modal.show();
-    }
-
-    // Add this function to your script.js
     async function handleTemplateSubmit(e) {
         e.preventDefault();
-        // Get the form
+
         const form = e.target.tagName === 'FORM' ? e.target : document.getElementById('templateForm');
         if (!form) {
             console.error('Form not found');
             return;
         }
 
-        const submitBtn = document.getElementById('submitTemplate') ||
-                         form.querySelector('button[type="submit"]');
+        const submitBtn = document.getElementById('submitTemplate') || form.querySelector('button[type="submit"]');
         if (!submitBtn) {
             console.error('Submit button not found');
             return;
         }
 
-
         const originalBtnText = submitBtn.innerHTML;
+        const spinner = submitBtn.querySelector('.spinner-border');
 
         try {
             // Show loading state
             submitBtn.disabled = true;
-            const spinner = submitBtn.querySelector('.spinner-border');
             if (spinner) spinner.classList.remove('d-none');
-            submitBtn.innerHTML = 'Creating... ' + spinner.outerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
 
             // Get form values
             const templateData = {
@@ -251,6 +263,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!templateData.workflowId || !templateData.name) {
                 throw new Error('Please fill in all required fields');
             }
+
+            if (!templateData.htmlTemplate || templateData.htmlTemplate.trim().length === 0) {
+                throw new Error('Please provide an HTML template');
+            }
+
             // Send request
             const response = await fetch('/v1/workflow/template', {
                 method: 'POST',
@@ -267,16 +284,24 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Close modal and refresh list
-            const modal = bootstrap.Modal.getInstance(form.closest('.modal'));
+            const modal = bootstrap.Modal.getInstance(newTemplateModal);
             if (modal) modal.hide();
 
+            // Reset form
             form.reset();
-            if (editor) editor.setValue(''); // Clear editor
+            if (editor) {
+                editor.setValue('<!-- Your HTML template here -->\n<!-- Use placeholders like {{workflowId}}, {{workflowName}}, {{workflowDescription}}, {{requesterServiceName}}, {{approveLink}}, {{rejectLink}} -->\n');
+            }
+
+            // Reload templates
             await loadWorkflowTemplates();
+
+            // Show success message (optional)
+            showNotification('Template created successfully!', 'success');
 
         } catch (error) {
             console.error('Error:', error);
-            alert(error.message || 'Failed to create template');
+            showNotification(error.message || 'Failed to create template', 'error');
         } finally {
             // Reset button state
             if (submitBtn) {
@@ -286,8 +311,26 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    const createBtn = document.getElementById('createFirstTemplateBtn');
-        if (createBtn) {
-            createBtn.addEventListener('click', createWorkflowTemplate);
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text ? String(text).replace(/[&<>"']/g, m => map[m]) : '';
+    }
+
+    // Optional: Show notification function
+    function showNotification(message, type = 'info') {
+        // You can implement a toast notification here
+        // For now, using alert as fallback
+        if (type === 'error') {
+            alert(message);
+        } else {
+            console.log(message);
         }
+    }
 });
