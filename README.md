@@ -61,6 +61,7 @@ MAILGUN_DOMAIN=
 ```
 
 CLI Arguments -> `--spring.profiles.active=local`
+DB Schema Creation -> `source db_schema.sql` [SQL File](https://github.com/YatharthLakhera/Human-In-The-Loop/blob/main/src/main/resources/db_schema.sql)
 
 ## API Documentation
 
