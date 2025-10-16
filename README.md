@@ -48,7 +48,19 @@ graph TD
 
 ### Environment Setup
 
-Create a `.env` file in the project root:
+```
+AWS_ACCESS_KEY=
+AWS_ACCOUNT_ID=
+AWS_REGION=
+AWS_SECRET_KEY=
+AWS_SQS_REGION=
+DB_PASSWORD=
+EMAIL_ADDRESS_FROM=
+MAILGUN_API_KEY=
+MAILGUN_DOMAIN=
+```
+
+CLI Arguments -> `--spring.profiles.active=local`
 
 ## API Documentation
 
